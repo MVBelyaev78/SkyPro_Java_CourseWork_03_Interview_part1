@@ -1,9 +1,11 @@
 package pro.sky.telegrambot.scheduler;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.pengrad.telegrambot.TelegramBot;
+import com.pengrad.telegrambot.request.SendMessage;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import pro.sky.telegrambot.configuration.TelegramBotConfiguration;
 import pro.sky.telegrambot.repository.NotificationTaskRepository;
 
 import java.time.LocalDateTime;
@@ -12,9 +14,10 @@ import java.time.temporal.ChronoUnit;
 @Service
 public class Scheduler {
 
-    private final Logger logger = LoggerFactory.getLogger(Scheduler.class);
-
     final NotificationTaskRepository notificationTaskRepository;
+
+    @Autowired
+    private final TelegramBot telegramBot = (new TelegramBotConfiguration()).telegramBot();
 
     public Scheduler(NotificationTaskRepository notificationTaskRepository) {
         this.notificationTaskRepository = notificationTaskRepository;
@@ -25,7 +28,8 @@ public class Scheduler {
         notificationTaskRepository
                 .findByDateTime(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES))
                 .forEach(notificationTask -> {
-            logger.info(String.valueOf(notificationTask));
+            telegramBot.execute(new SendMessage(notificationTask.getChatNumber(),
+                    notificationTask.getNotificationTask()));
         });
     }
 }

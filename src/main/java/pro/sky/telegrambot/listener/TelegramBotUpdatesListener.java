@@ -54,9 +54,8 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
                     final String dateStr = matcher.group(1);
                     final String item = matcher.group(3);
                     final LocalDateTime date = LocalDateTime.parse(dateStr, DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm"));
-                    notificationTaskRepository.save(new NotificationTask(NotificationTask.chatNumberTelegram, item, date));
+                    notificationTaskRepository.save(new NotificationTask(chatId, item, date));
                     telegramBot.execute(new SendMessage(chatId, "Notification saved"));
-                    logger.info("Notification saved");
                 }
             }
         });

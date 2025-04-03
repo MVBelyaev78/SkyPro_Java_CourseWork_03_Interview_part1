@@ -12,8 +12,8 @@ public class NotificationTask {
     @Column(name = "id_notification_task")
     private Long id;
 
-    @Column(name = "kd_chat")
-    private Integer chatNumber;
+    @Column(name = "nn_chat")
+    private Long chatNumber;
 
     @Column(name = "vl_notification_task")
     private String notificationTask;
@@ -21,12 +21,10 @@ public class NotificationTask {
     @Column(name = "dt_notification_task")
     private LocalDateTime dateTime;
 
-    public static final Integer chatNumberTelegram = 1;
-
     public NotificationTask() {
     }
 
-    public NotificationTask(Integer chatNumber, String notificationTask, LocalDateTime dateTime) {
+    public NotificationTask(Long chatNumber, String notificationTask, LocalDateTime dateTime) {
         this.chatNumber = chatNumber;
         this.notificationTask = notificationTask;
         this.dateTime = dateTime;
@@ -40,11 +38,11 @@ public class NotificationTask {
         this.id = id;
     }
 
-    public Integer getChatNumber() {
+    public Long getChatNumber() {
         return chatNumber;
     }
 
-    public void setChatNumber(Integer chatNumber) {
+    public void setChatNumber(Long chatNumber) {
         this.chatNumber = chatNumber;
     }
 
@@ -81,7 +79,7 @@ public class NotificationTask {
 
     @Override
     public String toString() {
-        return String.format("Student: {id=%s, chatNumber='%s', notificationTask=%s, dateTime=%s}",
+        return String.format("NotificationTask: {id=%s, chatNumber='%s', notificationTask=%s, dateTime=%s}",
                 id, chatNumber, notificationTask, dateTime);
     }
 }
