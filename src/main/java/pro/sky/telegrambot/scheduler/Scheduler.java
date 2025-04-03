@@ -23,11 +23,10 @@ public class Scheduler {
 
     @Scheduled(cron = "0 0/1 * * * *")
     void run() {
-        final LocalDateTime dt = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
-        logger.info("datetime: " + dt);
-        for (NotificationTask nt : notificationTaskRepository.findByDateTime(dt)) {
-            logger.info("datetime: " + dt + " iteration");
-            logger.info(String.valueOf(nt));
-        }
+        notificationTaskRepository
+                .findByDateTime(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES))
+                .forEach(notificationTask -> {
+            logger.info(String.valueOf(notificationTask));
+        });
     }
 }
