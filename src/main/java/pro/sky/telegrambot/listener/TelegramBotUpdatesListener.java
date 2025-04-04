@@ -11,13 +11,11 @@ import org.springframework.stereotype.Service;
 import pro.sky.telegrambot.configuration.TelegramBotConfiguration;
 import pro.sky.telegrambot.model.NotificationTask;
 import pro.sky.telegrambot.repository.NotificationTaskRepository;
+import pro.sky.telegrambot.utility.ProcessResult;
+import pro.sky.telegrambot.utility.ProcessUtility;
 
 import javax.annotation.PostConstruct;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Service
 public class TelegramBotUpdatesListener implements UpdatesListener {
@@ -43,20 +41,18 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
         updates.forEach(update -> {
             logger.info("Processing update: {}", update);
             // Process your updates here
-            final String message = update.message().text();
             final long chatId = update.message().chat().id();
-            if (message.equals("/start")) {
-                telegramBot.execute(new SendMessage(chatId, "Hello!"));
-            } else {
-                final Pattern pattern = Pattern.compile("(\\d{2}\\.\\d{2}\\.\\d{4}\\s\\d{2}:\\d{2})(\\s+)(.+)");
-                final Matcher matcher = pattern.matcher(message);
-                if (matcher.matches()) {
-                    final String dateStr = matcher.group(1);
-                    final String item = matcher.group(3);
-                    final LocalDateTime date = LocalDateTime.parse(dateStr, DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm"));
-                    notificationTaskRepository.save(new NotificationTask(chatId, item, date));
-                    telegramBot.execute(new SendMessage(chatId, "Notification saved"));
-                }
+            ProcessUtility processUtility = new ProcessUtility();
+            processUtility.process(update.message().text());
+            if (processUtility.getResult() == ProcessResult.DATABASE ||
+                    processUtility.getResult() == ProcessResult.BOTH) {
+                notificationTaskRepository.save(new NotificationTask(chatId,
+                        processUtility.getNotificationTask(),
+                        processUtility.getDateTime()));
+            }
+            if (processUtility.getResult() == ProcessResult.TELEGRAM ||
+                    processUtility.getResult() == ProcessResult.BOTH) {
+                telegramBot.execute(new SendMessage(chatId, processUtility.getTelegramMessage()));
             }
         });
         return UpdatesListener.CONFIRMED_UPDATES_ALL;
