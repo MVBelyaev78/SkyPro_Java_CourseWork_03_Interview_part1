@@ -1,10 +1,13 @@
 package pro.sky.telegrambot.utility;
 
+import org.springframework.stereotype.Service;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Service
 public class ProcessUtility {
 
     private String telegramMessage;
